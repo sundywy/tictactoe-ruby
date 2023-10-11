@@ -15,13 +15,12 @@ class Game
   end
 
   def run
-    loop do
+    until over?
       renderer.render
-
       puts "It's #{current_player.sym}'s turn"
       puts "Please take a move"
       loop do
-        pos = get_pos
+        pos = current_player.get_pos
         board.place(pos, current_player.sym)
         break
       rescue InvalidMoveError => e
@@ -29,15 +28,21 @@ class Game
       end
       swap_player!
     end
+
+    if board.have_winner?
+      swap_player!
+      puts "Winner is #{current_player.sym}!"
+    end
+
   end
 
   private
 
-  def get_pos
-    gets.chomp.split(",").map { |x| x.to_i }
-  end
-
   def swap_player!
     self.current_player = (current_player == player1) ? player2 : player1
+  end
+
+  def over?
+    board.full? || board.have_winner?
   end
 end
